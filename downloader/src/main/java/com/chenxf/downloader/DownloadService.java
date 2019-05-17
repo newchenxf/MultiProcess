@@ -24,14 +24,17 @@ public class DownloadService extends Service {
 
     public class DownloadServiceStub extends IDownloadAidl.Stub {
 
+
         @Override
-        public void sendMessage(String url) throws RemoteException {
+        public void sendMessage(DownloadBean url) throws RemoteException {
 
         }
 
         @Override
-        public int getMessage(int param) throws RemoteException {
-            return 2;
+        public DownloadBean getMessage(DownloadBean param) throws RemoteException {
+            DownloadBean result = new DownloadBean();
+            result.setDownloadResult("/sdcard/xx.mp4");
+            return result;
         }
     }
 }

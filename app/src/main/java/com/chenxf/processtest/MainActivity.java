@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.chenxf.downloader.DownloadBean;
 import com.chenxf.downloader.DownloadService;
 import com.chenxf.downloader.IDownloadAidl;
 
@@ -23,18 +24,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.go_process_daemon).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.start_service).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    int result = downloadAidl.getMessage(1);
-                    Toast.makeText(MainActivity.this, "result " + result, Toast.LENGTH_LONG).show();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                handleClick();
             }
         });
-        startService();
+    }
+
+    private void handleClick() {
+        if(downloadAidl == null) {
+            //点击时，才开启进程，没有start的话，系统不会有downloder进程
+            startService();
+        } else {
+            try {
+                DownloadBean result = downloadAidl.getMessage(new DownloadBean("http://xx.mp4"));
+                Toast.makeText(MainActivity.this, "result " + result.getDownloadResult(), Toast.LENGTH_LONG).show();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(downloadAidl != null) {
+            unbindService(conn);
+        }
     }
 
     private void startService() {
